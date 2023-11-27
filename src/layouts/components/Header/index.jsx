@@ -43,8 +43,12 @@ export default function Header() {
   useEffect(() => {
     const fetchUserData = async () => {
       if (accessToken) {
-        const userDataRes = await requestApi('/users/curr/info', 'GET');
-        initUserData(userDataRes.data.result);
+        try {
+          const userDataRes = await requestApi('/users/curr/info', 'GET');
+          initUserData(userDataRes.data.result);
+        } catch (err) {
+          handleLogout();
+        }
       }
     };
 
@@ -73,7 +77,7 @@ export default function Header() {
   };
 
   return (
-    <Flex gap={4} px={16} h="full" alignItems="center" bg="layoutBg" zIndex="overlay">
+    <Flex gap={4} px={16} h="full" alignItems="center" bg="layoutBg">
       <Flex color="gray" gap={8}>
         <Box>
           <FaArrowLeft />
@@ -107,7 +111,7 @@ export default function Header() {
           bg="whiteAlpha.400"
           rounded="full"
         />
-        <MenuList bg="primaryBg">
+        <MenuList bg="primaryBg" borderColor="primaryBg">
           <MenuItem color="white" bg="primaryBg" icon={<AiOutlinePlayCircle size={20} />}>
             Trình phát nhạc
           </MenuItem>
@@ -124,7 +128,7 @@ export default function Header() {
             bg="whiteAlpha.400"
             rounded="full"
           />
-          <MenuList px={4} bg="primaryBg">
+          <MenuList px={4} bg="primaryBg" borderColor="primaryBg">
             <MenuItem color="white" bg="primaryBg">
               <Button
                 rounded="full"
@@ -166,7 +170,7 @@ export default function Header() {
             bg="whiteAlpha.400"
             rounded="full"
           />
-          <MenuList px={4} bg="primaryBg">
+          <MenuList px={4} bg="primaryBg" borderColor="primaryBg">
             <Flex py={4} justifyContent="center" alignItems="center" gap={2}>
               <Avatar bg="purple.500" src={userData.avatar} />
               <Text color="white" fontWeight="bold" fontSize="larger">

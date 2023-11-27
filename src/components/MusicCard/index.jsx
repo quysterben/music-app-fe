@@ -1,0 +1,51 @@
+import Proptypes from 'prop-types';
+
+import useQueueStore from '../../hooks/useQueueStore';
+
+import { Flex, Text, Image } from '@chakra-ui/react';
+import timeFromNow from '../../helpers/getTimeFromNow';
+
+MusicCard.propTypes = {
+  musicData: Proptypes.object.isRequired,
+};
+
+export default function MusicCard({ musicData }) {
+  const addSongToQueue = useQueueStore((state) => state.addSongToQueue);
+  const queue = useQueueStore((state) => state.queue);
+
+  const handleAddSongToQueue = () => {
+    if (queue.length === 0) {
+      addSongToQueue(musicData);
+    } else {
+      const isSongExist = queue.find((song) => song.id === musicData.id);
+      if (!isSongExist) {
+        addSongToQueue(musicData);
+      }
+    }
+  };
+
+  return (
+    <Flex
+      onClick={handleAddSongToQueue}
+      rounded="md"
+      gap={4}
+      cursor="pointer"
+      w="full"
+      p={4}
+      _hover={{ bg: 'whiteAlpha.400' }}
+    >
+      <Image rounded="md" boxSize="100" src={musicData.artwork} alt="..." />
+      <Flex flexDir="column">
+        <Text fontSize="xl" fontWeight="bold">
+          {musicData.name}
+        </Text>
+        <Text mb={2} color="whiteAlpha.600">
+          {musicData.artist}
+        </Text>
+        <Text fontSize="xs" color="whiteAlpha.600">
+          {timeFromNow(musicData.created_at)}
+        </Text>
+      </Flex>
+    </Flex>
+  );
+}
