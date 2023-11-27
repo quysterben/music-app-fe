@@ -21,6 +21,7 @@ import showNotSupport from '../../../helpers/showNotSupport';
 import useNavigateSideBar from '../../../hooks/useNavigateSideBar';
 import PlaylistModal from '../../../components/common/Modal/PlaylistModal';
 import useUserData from '../../../hooks/useUserData';
+import LoginModal from '../../../components/common/Modal/LoginModal';
 
 const TabList1 = [
   {
@@ -212,7 +213,11 @@ export default function SideBar() {
           </Flex>
         </Flex>
 
-        <PlaylistModal isOpen={isOpen} onClose={onClose} />
+        {userData.id ? (
+          <PlaylistModal isOpen={isOpen} onClose={onClose} />
+        ) : (
+          <LoginModal isOpen={isOpen} onClose={onClose} />
+        )}
       </GridItem>
     </Grid>
   );

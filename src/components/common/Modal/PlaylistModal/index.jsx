@@ -26,8 +26,6 @@ PlaylistModal.propTypes = {
 export default function PlaylistModal({ isOpen, onClose }) {
   const [playlistName, setPlaylistName] = useState('');
 
-  console.log(playlistName);
-
   return (
     <Modal size="xs" isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />

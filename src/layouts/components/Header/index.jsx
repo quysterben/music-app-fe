@@ -27,11 +27,13 @@ import { AiOutlinePlayCircle } from 'react-icons/ai';
 import { MdOutlineFileUpload } from 'react-icons/md';
 
 import LoginModal from '../../../components/common/Modal/LoginModal';
+import RegisterModal from '../../../components/common/Modal/RegisterModal';
 
 import requestApi from '../../../utils/api';
 
 export default function Header() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isOpenLogin, onOpen: onOpenLogin, onClose: onCloseLogin } = useDisclosure();
+  const { isOpen: isOpenRegiter, onOpen: onOpenRegiter, onClose: onCloseRegiter } = useDisclosure();
   const toast = useToast();
 
   const accessToken = localStorage.getItem('accessToken');
@@ -132,7 +134,7 @@ export default function Header() {
                 w="full"
                 _hover={{ bg: 'purple.500' }}
                 mx="auto"
-                onClick={onOpen}
+                onClick={onOpenLogin}
               >
                 Đăng nhập
               </Button>
@@ -146,6 +148,7 @@ export default function Header() {
                 w="full"
                 _hover={{ bg: 'purple.500' }}
                 mx="auto"
+                onClick={onOpenRegiter}
               >
                 Đăng ký
               </Button>
@@ -178,6 +181,8 @@ export default function Header() {
               Tải lên
             </MenuItem>
             <MenuItem
+              mb={4}
+              mt={2}
               onClick={handleLogout}
               color="white"
               bg="primaryBg"
@@ -188,7 +193,8 @@ export default function Header() {
           </MenuList>
         </Menu>
       )}
-      <LoginModal isOpen={isOpen} onClose={onClose} />
+      <LoginModal isOpen={isOpenLogin} onClose={onCloseLogin} />
+      <RegisterModal isOpen={isOpenRegiter} onClose={onCloseRegiter} />
     </Flex>
   );
 }

@@ -1,6 +1,6 @@
 import Proptypes from 'prop-types';
 
-import useUserData from '../../../../hooks/useUserData';
+import { useEffect } from 'react';
 
 import {
   Modal,
@@ -22,27 +22,33 @@ import {
 
 import requestApi from '../../../../utils/api';
 
-LoginModal.propTypes = {
+RegisterModal.propTypes = {
   isOpen: Proptypes.bool,
   onClose: Proptypes.func,
 };
 
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-const LoginSchema = Yup.object().shape({
+const RegisterSchema = Yup.object().shape({
   password: Yup.string().min(6, 'Too Short!').max(20, 'Too Long!').required('Required'),
   email: Yup.string().email('Invalid email').required('Required'),
+  first_name: Yup.string().required('Required'),
+  last_name: Yup.string().required('Required'),
+  repassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match'),
 });
 
-export default function LoginModal({ isOpen, onClose }) {
+export default function RegisterModal({ isOpen, onClose }) {
   const formik = useFormik({
     initialValues: {
       email: '',
       password: '',
+      repassword: '',
+      first_name: '',
+      last_name: '',
     },
-    validationSchema: LoginSchema,
+    validationSchema: RegisterSchema,
   });
 
   useEffect(() => {
@@ -51,28 +57,29 @@ export default function LoginModal({ isOpen, onClose }) {
 
   const [showPwd, setShowPwd] = useState(false);
   const handleShowPwd = () => setShowPwd(!showPwd);
+  const [showRePws, setShowRePws] = useState(false);
+  const handleShowRePwd = () => setShowRePws(!showRePws);
 
-  const initUserData = useUserData((state) => state.initUserData);
   const toast = useToast();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formik.errors);
+
     if (formik.errors.email || !formik.touched.email) return;
+    if (formik.errors.first_name || !formik.touched.first_name) return;
+    if (formik.errors.last_name || !formik.touched.last_name) return;
     if (formik.errors.password || !formik.touched.password) return;
+    if (formik.errors.repassword || !formik.touched.repassword) return;
 
     try {
-      const res = await requestApi('/auth/login', 'POST', formik.values);
+      await requestApi('/auth/register', 'POST', formik.values);
       toast({
-        title: 'Logged in successfully!',
+        title: 'Register in successfully!',
         status: 'success',
         position: 'top-right',
         isClosable: true,
         duration: 2000,
       });
-      localStorage.setItem('accessToken', res.data.result.tokens.access_token);
-      localStorage.setItem('refreshToken', res.data.result.tokens.refresh_token);
-      localStorage.setItem('userId', res.data.result.id);
-      const userDataRes = await requestApi('/users/curr/info', 'GET');
-      initUserData(userDataRes.data.result);
       onClose();
       formik.resetForm();
     } catch (err) {
@@ -89,9 +96,9 @@ export default function LoginModal({ isOpen, onClose }) {
   return (
     <Modal size="md" isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
-      <ModalContent as="form" onSubmit={handleSubmit} bg="primaryBg">
+      <ModalContent autoComplete="off" as="form" onSubmit={handleSubmit} bg="primaryBg">
         <ModalHeader color="white" fontWeight="bold" mx="auto">
-          Đăng Nhập
+          Đăng ký
         </ModalHeader>
         <ModalCloseButton color="white" />
         <ModalBody>
@@ -114,6 +121,44 @@ export default function LoginModal({ isOpen, onClose }) {
                 placeholder="Email"
               />
               <FormErrorMessage ml={4}>{'*' + formik.errors.email}</FormErrorMessage>
+            </FormControl>
+            <FormControl isInvalid={formik.errors.first_name && formik.touched.first_name}>
+              <Input
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.first_name}
+                color="white"
+                borderRadius="full"
+                autoComplete="none"
+                px={4}
+                py={2}
+                id="first_name"
+                name="first_name"
+                type="text"
+                bg="whiteAlpha.400"
+                variant="unstyled"
+                placeholder="first_name"
+              />
+              <FormErrorMessage ml={4}>{'*' + formik.errors.first_name}</FormErrorMessage>
+            </FormControl>
+            <FormControl isInvalid={formik.errors.last_name && formik.touched.last_name}>
+              <Input
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.last_name}
+                color="white"
+                borderRadius="full"
+                autoComplete="none"
+                px={4}
+                py={2}
+                id="last_name"
+                name="last_name"
+                type="text"
+                bg="whiteAlpha.400"
+                variant="unstyled"
+                placeholder="Last Name"
+              />
+              <FormErrorMessage ml={4}>{'*' + formik.errors.last_name}</FormErrorMessage>
             </FormControl>
             <FormControl isInvalid={formik.errors.password && formik.touched.password}>
               <InputGroup>
@@ -148,6 +193,40 @@ export default function LoginModal({ isOpen, onClose }) {
                 </InputRightElement>
               </InputGroup>
               <FormErrorMessage ml={4}>{'*' + formik.errors.password}</FormErrorMessage>
+            </FormControl>
+            <FormControl isInvalid={formik.errors.repassword && formik.touched.repassword}>
+              <InputGroup>
+                <Input
+                  color="white"
+                  borderRadius="full"
+                  px={4}
+                  py={2}
+                  id="repassword"
+                  autoComplete="off"
+                  name="repassword"
+                  type={showRePws ? 'text' : 'password'}
+                  bg="whiteAlpha.400"
+                  variant="unstyled"
+                  placeholder="Nhập Lại Mật Khẩu"
+                  onChange={formik.handleChange}
+                  value={formik.values.repassword}
+                  onBlur={formik.handleBlur}
+                />
+                <InputRightElement>
+                  <Button
+                    px="1.4rem"
+                    mr="1.2rem"
+                    h="1.75rem"
+                    bg="whiteAlpha.200"
+                    _hover={{ bg: 'whiteAlpha.300' }}
+                    size="sm"
+                    onClick={handleShowRePwd}
+                  >
+                    {showRePws ? 'Hide' : 'Show'}
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+              <FormErrorMessage ml={4}>{'*' + formik.errors.repassword}</FormErrorMessage>
             </FormControl>
           </VStack>
         </ModalBody>
