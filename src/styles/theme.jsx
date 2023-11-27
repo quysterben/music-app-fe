@@ -19,6 +19,7 @@ const theme = extendTheme({
       500: '#adb5bd',
       600: '#868e96',
     },
+    sidebarBg: '#2a213a',
     layoutBg: '#170f23',
     purplePrimary: '#9b4de0',
     primaryBg: '#34224f',

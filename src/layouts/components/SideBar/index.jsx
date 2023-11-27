@@ -20,6 +20,7 @@ import showNotSupport from '../../../helpers/showNotSupport';
 
 import useNavigateSideBar from '../../../hooks/useNavigateSideBar';
 import PlaylistModal from '../../../components/common/Modal/PlaylistModal';
+import useUserData from '../../../hooks/useUserData';
 
 const TabList1 = [
   {
@@ -68,23 +69,27 @@ const TabList2 = [
     url: '/nghe-gan-day',
     notSupport: true,
     icon: customIcon.IconRecently,
+    logginRequire: true,
   },
   {
     Text: 'Bài hát yêu thích',
     url: '/bai-hat-yeu-thich',
     notSupport: true,
+    logginRequire: true,
     icon: customIcon.IconLove,
   },
   {
     Text: 'Playlist',
     url: '/playlist',
     notSupport: true,
+    logginRequire: true,
     icon: customIcon.IconPlaylist,
   },
   {
     Text: 'Đã tải lên',
     url: '/da-tai-len',
     notSupport: true,
+    logginRequire: true,
     icon: customIcon.IconUpload,
   },
 ];
@@ -102,6 +107,8 @@ export default function SideBar() {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const userData = useUserData((state) => state.userData);
+
   return (
     <Grid
       templateAreas={`"logo"
@@ -109,7 +116,7 @@ export default function SideBar() {
                     "tabList2"
                     "footer"`}
       gridTemplateRows={'60px 220px 1fr 60px'}
-      bg="layoutBg"
+      bg="sidebarBg"
       h="full"
     >
       <GridItem area={'logo'}>
@@ -163,6 +170,7 @@ export default function SideBar() {
       >
         <VStack spacing={0} align="start">
           {TabList2.map((item, index) => {
+            if (item.logginRequire && !userData.id) return;
             if (item.notSupport)
               return (
                 <Flex
