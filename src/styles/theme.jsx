@@ -19,6 +19,8 @@ const theme = extendTheme({
       500: '#adb5bd',
       600: '#868e96',
     },
+    layoutBg: '#170f23',
+    purplePrimary: '#9b4de0',
   },
 });
 
