@@ -1,6 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 
-import { Box, Flex, Grid, Image, VStack, useToast, GridItem, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Grid,
+  Image,
+  VStack,
+  useToast,
+  GridItem,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react';
 
 const logoUrl = 'https://zmp3-static.zmdcdn.me/skins/zmp3-v6.1/images/backgrounds/logo-dark.svg';
 import customIcon from '../../../assets/Icons';
@@ -9,6 +19,7 @@ import { FaPlus } from 'react-icons/fa';
 import showNotSupport from '../../../helpers/showNotSupport';
 
 import useNavigateSideBar from '../../../hooks/useNavigateSideBar';
+import PlaylistModal from '../../../components/common/Modal/PlaylistModal';
 
 const TabList1 = [
   {
@@ -88,6 +99,8 @@ export default function SideBar() {
     navigate(path);
     setNavigateUrl(path);
   };
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
     <Grid
@@ -184,11 +197,14 @@ export default function SideBar() {
             py={4}
             color="white"
             fontSize="revert-layer"
+            onClick={onOpen}
           >
             <FaPlus />
             <Text>Tạo playlist mới</Text>
           </Flex>
         </Flex>
+
+        <PlaylistModal isOpen={isOpen} onClose={onClose} />
       </GridItem>
     </Grid>
   );

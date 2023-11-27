@@ -21,6 +21,7 @@ const theme = extendTheme({
     },
     layoutBg: '#170f23',
     purplePrimary: '#9b4de0',
+    primaryBg: '#34224f',
   },
 });
 
