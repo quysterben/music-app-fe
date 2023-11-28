@@ -1,12 +1,13 @@
 /* eslint-disable no-unused-vars */
 import Proptypes from 'prop-types';
-import { HStack, Box, VStack, Text, Image, Heading } from '@chakra-ui/react';
-import { FcLike } from 'react-icons/fc';
+import { HStack, Box, VStack, Text, Image, Heading, Flex } from '@chakra-ui/react';
+import { FaRegHeart } from 'react-icons/fa';
 
 import usePlayerStore from '../../hooks/usePlayerStore';
 import useQueueStore from '../../hooks/useQueueStore';
 import useUserData from '../../hooks/useUserData';
 import requestApi from '../../utils/api';
+import isFavoriteSong from '../../helpers/isFavouriteSong';
 
 MusicRankingCard.propTypes = {
   songData: Proptypes.object.isRequired,
@@ -15,6 +16,8 @@ MusicRankingCard.propTypes = {
 
 function MusicRankingCard({ songData, rank }) {
   const accessToken = localStorage.getItem('accessToken');
+
+  const favoritedSongs = useUserData((state) => state.favoritedSongs);
 
   const addSongToQueue = useQueueStore((state) => state.addSongToQueue);
   const queue = useQueueStore((state) => state.queue);
@@ -53,6 +56,17 @@ function MusicRankingCard({ songData, rank }) {
     }
   };
 
+  const initFavoritedSongsData = useUserData((state) => state.initFavoritedSongsData);
+
+  const handleFavoriteSong = async () => {
+    try {
+      const res = await requestApi(`/songs/favorite/${songData.id}`, 'GET');
+      initFavoritedSongsData(res.data.result.response.favoriteSongs);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <HStack
       color="white"
@@ -60,10 +74,9 @@ function MusicRankingCard({ songData, rank }) {
       borderRadius="10px"
       justifyContent="space-between"
       w="100%"
-      onClick={handleAddSongToQueue}
       _hover={{ cursor: 'pointer', bg: 'primaryBg' }}
     >
-      <HStack>
+      <HStack flex={1} onClick={handleAddSongToQueue}>
         <Box mx={10}>
           <Heading fontSize="40" fontWeight="bold" color="#eee">
             {rank}
@@ -91,9 +104,13 @@ function MusicRankingCard({ songData, rank }) {
       </HStack>
 
       <HStack>
-        <Box>
-          <FcLike color="#fff" />
-        </Box>
+        <Flex
+          mx={4}
+          onClick={handleFavoriteSong}
+          color={isFavoriteSong(songData, favoritedSongs) ? 'purplePrimary' : 'whiteAlpha.600'}
+        >
+          <FaRegHeart size="16" />
+        </Flex>
         <Text>3:55</Text>
       </HStack>
     </HStack>
