@@ -1,6 +1,6 @@
-import React from 'react';
+/* eslint-disable no-unused-vars */
 import Proptypes from 'prop-types';
-import { HStack, Box, VStack, Text, Image } from '@chakra-ui/react';
+import { HStack, Box, VStack, Text, Image, Heading } from '@chakra-ui/react';
 import { FcLike } from 'react-icons/fc';
 
 import usePlayerStore from '../../hooks/usePlayerStore';
@@ -8,11 +8,12 @@ import useQueueStore from '../../hooks/useQueueStore';
 import useUserData from '../../hooks/useUserData';
 import requestApi from '../../utils/api';
 
-MusicListItem.propTypes = {
+MusicRankingCard.propTypes = {
   songData: Proptypes.object.isRequired,
+  rank: Proptypes.number.isRequired,
 };
 
-function MusicListItem({ songData }) {
+function MusicRankingCard({ songData, rank }) {
   const accessToken = localStorage.getItem('accessToken');
 
   const addSongToQueue = useQueueStore((state) => state.addSongToQueue);
@@ -54,14 +55,21 @@ function MusicListItem({ songData }) {
 
   return (
     <HStack
+      color="white"
       p="10px 10px"
       borderRadius="10px"
       justifyContent="space-between"
       w="100%"
-      _hover={{ cursor: 'pointer', bg: 'primaryBg' }}
       onClick={handleAddSongToQueue}
+      _hover={{ cursor: 'pointer', bg: 'primaryBg' }}
     >
       <HStack>
+        <Box mx={10}>
+          <Heading fontSize="40" fontWeight="bold" color="#eee">
+            {rank}
+          </Heading>
+        </Box>
+
         <Box alignSelf="center" overflow="hidden" borderRadius="10px">
           <Image
             h="50px"
@@ -72,7 +80,7 @@ function MusicListItem({ songData }) {
           />
         </Box>
 
-        <VStack alignItems="flex-start" gap="0">
+        <VStack ml={2} alignItems="flex-start" gap="0">
           <Text fontWeight="bold" color="#eee">
             {songData?.name}
           </Text>
@@ -92,4 +100,4 @@ function MusicListItem({ songData }) {
   );
 }
 
-export default MusicListItem;
+export default MusicRankingCard;

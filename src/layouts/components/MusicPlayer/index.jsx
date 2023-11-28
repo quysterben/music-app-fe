@@ -106,7 +106,6 @@ export default function MusicPlayer() {
     try {
       const res = await requestApi(`/songs/favorite/${curruntSong.id}`, 'GET');
       initFavoritedSongsData(res.data.result.response.favoriteSongs);
-      console.log(isFavoriteSong(curruntSong, favoritedSongs));
     } catch (err) {
       console.log(err);
     }

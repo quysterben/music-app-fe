@@ -1,5 +1,4 @@
 const isFavoriteSong = (song, favoriteSongs) => {
-  console.log(song, favoriteSongs);
   if (!favoriteSongs || favoriteSongs.length === 0) {
     return false;
   }

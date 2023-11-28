@@ -28,12 +28,18 @@ import { MdOutlineFileUpload } from 'react-icons/md';
 
 import LoginModal from '../../../components/common/Modal/LoginModal';
 import RegisterModal from '../../../components/common/Modal/RegisterModal';
+import UploadSongModal from '../../../components/common/Modal/UploadSongModal';
 
 import requestApi from '../../../utils/api';
 
 export default function Header() {
   const { isOpen: isOpenLogin, onOpen: onOpenLogin, onClose: onCloseLogin } = useDisclosure();
   const { isOpen: isOpenRegiter, onOpen: onOpenRegiter, onClose: onCloseRegiter } = useDisclosure();
+  const {
+    isOpen: isOpenUploadSong,
+    onOpen: onOpenUploadSong,
+    onClose: onCloseUploadSong,
+  } = useDisclosure();
   const toast = useToast();
 
   const accessToken = localStorage.getItem('accessToken');
@@ -192,7 +198,12 @@ export default function Header() {
             <Text mb={4} color="white" fontWeight="bold" fontSize="larger" px={4}>
               Cá Nhân
             </Text>
-            <MenuItem color="white" bg="primaryBg" icon={<MdOutlineFileUpload size={20} />}>
+            <MenuItem
+              onClick={onOpenUploadSong}
+              color="white"
+              bg="primaryBg"
+              icon={<MdOutlineFileUpload size={20} />}
+            >
               Tải lên
             </MenuItem>
             <MenuItem
@@ -210,6 +221,7 @@ export default function Header() {
       )}
       <LoginModal isOpen={isOpenLogin} onClose={onCloseLogin} />
       <RegisterModal isOpen={isOpenRegiter} onClose={onCloseRegiter} />
+      <UploadSongModal isOpen={isOpenUploadSong} onClose={onCloseUploadSong} />
     </Flex>
   );
 }

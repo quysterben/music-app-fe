@@ -11,6 +11,7 @@ const useUserData = create((set) => ({
   },
   playlists: [],
   songs: [],
+  recentSongs: [],
   favoritedSongs: [],
   initUserData: (data) => {
     console.log(data);
@@ -37,6 +38,7 @@ const useUserData = create((set) => ({
       playlists: [],
       songs: [],
       favoritedSongs: [],
+      recentSongs: [],
     });
   },
   initPlaylistsData: (data) => {
@@ -47,6 +49,9 @@ const useUserData = create((set) => ({
   },
   initFavoritedSongsData: (data) => {
     return set({ favoritedSongs: data });
+  },
+  initRecentSongsData: (data) => {
+    return set({ recentSongs: data });
   },
 }));
 

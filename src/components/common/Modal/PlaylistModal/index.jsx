@@ -14,6 +14,9 @@ import {
   VStack,
   Input,
   useToast,
+  Flex,
+  Text,
+  Switch,
 } from '@chakra-ui/react';
 
 import requestApi from '../../../../utils/api';
@@ -26,10 +29,11 @@ PlaylistModal.propTypes = {
 export default function PlaylistModal({ isOpen, onClose }) {
   const toast = useToast();
   const [playlistName, setPlaylistName] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
 
   const handleSubmit = async () => {
     try {
-      await requestApi('/playlists', 'POST', { name: playlistName });
+      await requestApi('/playlists', 'POST', { name: playlistName, isPublic: isPublic });
       toast({
         title: 'Tạo playlist mới thành công',
         status: 'success',
@@ -70,6 +74,15 @@ export default function PlaylistModal({ isOpen, onClose }) {
               variant="unstyled"
               placeholder="Tên playlist"
             />
+            <Flex justify="space-between" w="full" gap={2} alignItems="center">
+              <Flex flexDir="column" color={'white'}>
+                <Text>Công khai</Text>
+                <Text fontSize="xs" color="gray">
+                  Mọi người có thể nhìn thấy playlist này
+                </Text>
+              </Flex>
+              <Switch onChange={() => setIsPublic(true)} colorScheme="purple" size="md" />
+            </Flex>
           </VStack>
         </ModalBody>
 

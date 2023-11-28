@@ -6,20 +6,33 @@ import useQueueStore from '../../hooks/useQueueStore';
 import { Flex, Text, Image } from '@chakra-ui/react';
 import timeFromNow from '../../helpers/getTimeFromNow';
 
+import requestApi from '../../utils/api';
+import useUserData from '../../hooks/useUserData';
+
 MusicCard.propTypes = {
   musicData: Proptypes.object.isRequired,
 };
 
 export default function MusicCard({ musicData }) {
+  const accessToken = localStorage.getItem('accessToken');
+
   const addSongToQueue = useQueueStore((state) => state.addSongToQueue);
   const queue = useQueueStore((state) => state.queue);
+
+  const recentSong = useUserData((state) => state.recentSongs);
+  const initRecentSongsData = useUserData((state) => state.initRecentSongsData);
 
   const setCurruntSong = usePlayerStore((state) => state.setCurruntSong);
   const setCurruntSongIndex = usePlayerStore((state) => state.setCurruntSongIndex);
 
   const setIsPlaying = usePlayerStore((state) => state.setIsPlaying);
 
-  const handleAddSongToQueue = () => {
+  const handleAddSongToQueue = async () => {
+    if (accessToken) {
+      await requestApi(`/songs/recent/${musicData.id}`, 'POST');
+      initRecentSongsData([...recentSong, musicData]);
+    }
+
     if (queue.length === 0) {
       addSongToQueue(musicData);
       setCurruntSong(musicData);

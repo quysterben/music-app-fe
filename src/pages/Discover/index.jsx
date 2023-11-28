@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import useQueueStore from '../../hooks/useQueueStore';
+import useUserData from '../../hooks/useUserData';
 
 import { Flex, Image, Text, Heading, SimpleGrid } from '@chakra-ui/react';
 import Carousel from 'better-react-carousel';
@@ -20,13 +21,21 @@ const Image_URLS = [
 ];
 
 export default function Discover() {
+  const accessToken = localStorage.getItem('accessToken');
+
   const [loading, setLoading] = useState(true);
   const [songs, setSongs] = useState([]);
+  const recentSongs = useUserData((state) => state.recentSongs);
+  const initRecentSongsData = useUserData((state) => state.initRecentSongsData);
 
   useEffect(() => {
     const fetchData = async () => {
       const response = await requestApi('/songs', 'GET');
       setSongs(response.data.result);
+      if (accessToken) {
+        const recentSongRes = await requestApi('/songs/user/recent', 'GET');
+        initRecentSongsData(recentSongRes.data.result);
+      }
       setLoading(false);
     };
 
@@ -68,11 +77,12 @@ export default function Discover() {
         Gần đây
       </Heading>
       <SimpleGrid columns={3} ml={8}>
-        {!loading &&
-          queue
-            .slice(0, 3)
-            .toReversed()
-            .map((song) => <MusicCard key={song.id} musicData={song} />)}
+        {!loading && recentSongs.length === 0
+          ? queue
+              .slice(0, 3)
+              .toReversed()
+              .map((song) => <MusicCard key={song.id} musicData={song} />)
+          : recentSongs.slice(0, 3).map((song) => <MusicCard key={song.id} musicData={song} />)}
       </SimpleGrid>
       <Text color="gray.600" fontWeight="xs" ml={8}>
         Bắt đầu nghe từ một bài hát
