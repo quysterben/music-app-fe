@@ -1,5 +1,6 @@
 import Proptypes from 'prop-types';
 
+import usePlayerStore from '../../hooks/usePlayerStore';
 import useQueueStore from '../../hooks/useQueueStore';
 
 import { Flex, Text, Image } from '@chakra-ui/react';
@@ -13,9 +14,14 @@ export default function MusicCard({ musicData }) {
   const addSongToQueue = useQueueStore((state) => state.addSongToQueue);
   const queue = useQueueStore((state) => state.queue);
 
+  const setCurruntSong = usePlayerStore((state) => state.setCurruntSong);
+  const setCurruntSongIndex = usePlayerStore((state) => state.setCurruntSongIndex);
+
   const handleAddSongToQueue = () => {
     if (queue.length === 0) {
       addSongToQueue(musicData);
+      setCurruntSong(musicData);
+      setCurruntSongIndex(queue.length - 1);
     } else {
       const isSongExist = queue.find((song) => song.id === musicData.id);
       if (!isSongExist) {

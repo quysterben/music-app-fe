@@ -31,7 +31,6 @@ export default function Discover() {
     };
 
     fetchData();
-    console.log(songs);
   }, []);
 
   const queue = useQueueStore((state) => state.queue);
@@ -84,12 +83,7 @@ export default function Discover() {
         Tất cả bài hát
       </Heading>
       <SimpleGrid columns={3} ml={8} mb={40}>
-        {loading === false && songs.map((song) => <MusicCard key={song.id} musicData={song} />)}
-        {loading === false && songs.map((song) => <MusicCard key={song.id} musicData={song} />)}
-        {loading === false && songs.map((song) => <MusicCard key={song.id} musicData={song} />)}
-        {loading === false && songs.map((song) => <MusicCard key={song.id} musicData={song} />)}
-        {loading === false && songs.map((song) => <MusicCard key={song.id} musicData={song} />)}
-        {loading === false && songs.map((song) => <MusicCard key={song.id} musicData={song} />)}
+        {!loading && songs.map((song) => <MusicCard key={song.id} musicData={song} />)}
       </SimpleGrid>
     </Flex>
   );
