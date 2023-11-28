@@ -24,6 +24,21 @@ const useUserData = create((set) => ({
     };
     return set({ userData: newData });
   },
+  resetUserData: () => {
+    return set({
+      userData: {
+        id: null,
+        first_name: null,
+        last_name: null,
+        email: null,
+        avatar: null,
+        role: null,
+      },
+      playlists: [],
+      songs: [],
+      favoritedSongs: [],
+    });
+  },
   initPlaylistsData: (data) => {
     return set({ playlists: data });
   },

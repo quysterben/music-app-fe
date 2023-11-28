@@ -66,6 +66,34 @@ export default function MusicPlayer() {
     audioRef.current.volume = volume;
   }, [volume]);
 
+  const handleNextSong = () => {
+    if (currentSongIndex === queue.length - 1) {
+      setCurrentSong(queue[0]);
+      setCurrentSongIndex(0);
+      setIsPlaying(true);
+      audioRef.current.play();
+      return;
+    }
+    setCurrentSong(queue[currentSongIndex + 1]);
+    setCurrentSongIndex(currentSongIndex + 1);
+    setIsPlaying(true);
+    audioRef.current.play();
+  };
+
+  const handleBackSong = () => {
+    if (currentSongIndex === 0) {
+      setCurrentSong(queue[queue.length - 1]);
+      setCurrentSongIndex(queue.length - 1);
+      setIsPlaying(true);
+      audioRef.current.play();
+      return;
+    }
+    setCurrentSong(queue[currentSongIndex - 1]);
+    setCurrentSongIndex(currentSongIndex - 1);
+    setIsPlaying(true);
+    audioRef.current.play();
+  };
+
   // Handle open playlist drawer
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
@@ -110,7 +138,13 @@ export default function MusicPlayer() {
             <Flex p={2} cursor="pointer" rounded="full" _hover={{ bgColor: 'whiteAlpha.400' }}>
               <FaRandom size="16" color="white" />
             </Flex>
-            <Flex p={2} cursor="pointer" rounded="full" _hover={{ bgColor: 'whiteAlpha.400' }}>
+            <Flex
+              p={2}
+              onClick={handleBackSong}
+              cursor="pointer"
+              rounded="full"
+              _hover={{ bgColor: 'whiteAlpha.400' }}
+            >
               <FaStepBackward size="16" color="white" />
             </Flex>
             <Flex
@@ -126,7 +160,13 @@ export default function MusicPlayer() {
                 <MdPlayCircleOutline size="32" color="white" />
               )}
             </Flex>
-            <Flex p={2} cursor="pointer" rounded="full" _hover={{ bgColor: 'whiteAlpha.400' }}>
+            <Flex
+              p={2}
+              onClick={handleNextSong}
+              cursor="pointer"
+              rounded="full"
+              _hover={{ bgColor: 'whiteAlpha.400' }}
+            >
               <FaStepForward size="16" color="white" />
             </Flex>
             <Flex p={2} cursor="pointer" rounded="full" _hover={{ bgColor: 'whiteAlpha.400' }}>
@@ -164,6 +204,12 @@ export default function MusicPlayer() {
                   audioRef.current.currentTime = 0;
                   setIsPlaying(true);
                   audioRef.current.play();
+                  return;
+                }
+                if (queue.length === 1) {
+                  audioRef.current.currentTime = 0;
+                  setIsPlaying(false);
+                  audioRef.current.pause();
                   return;
                 }
                 if (currentSongIndex === queue.length - 1) {

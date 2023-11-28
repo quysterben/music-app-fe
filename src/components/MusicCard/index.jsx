@@ -23,7 +23,7 @@ export default function MusicCard({ musicData }) {
     if (queue.length === 0) {
       addSongToQueue(musicData);
       setCurruntSong(musicData);
-      setCurruntSongIndex(queue.length - 1);
+      setCurruntSongIndex(0);
       setIsPlaying(true);
     } else {
       const isSongExist = queue.find((song) => song.id === musicData.id);

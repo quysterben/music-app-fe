@@ -20,12 +20,25 @@ import useUserData from '../../hooks/useUserData';
 import PlaylistCard from '../../components/PlaylistCard';
 import useQueueStore from '../../hooks/useQueueStore';
 import MusicListItem from '../../components/MusicListItem';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useNavigateSideBar from '../../hooks/useNavigateSideBar';
 
 export default function Library() {
+  const navigate = useNavigate();
+  const setUrl = useNavigateSideBar((state) => state.setUrl);
+  const accessToken = localStorage.getItem('accessToken');
   const playlists = useUserData((state) => state.playlists);
   const songs = useUserData((state) => state.songs);
   const favoritedSongs = useUserData((state) => state.favoritedSongs);
   const queue = useQueueStore((state) => state.queue);
+
+  useEffect(() => {
+    if (!accessToken) {
+      navigate('/');
+      setUrl('/');
+    }
+  }, []);
 
   return (
     <Stack
@@ -36,6 +49,7 @@ export default function Library() {
       gap="50px"
       overflowY="auto"
       maxH={queue.length === 0 ? 'calc(100vh - 60px)' : 'calc(100vh - 140px)'}
+      h={queue.length === 0 ? 'calc(100vh - 60px)' : 'calc(100vh - 140px)'}
       css={{
         '&::-webkit-scrollbar': {
           width: '4px',

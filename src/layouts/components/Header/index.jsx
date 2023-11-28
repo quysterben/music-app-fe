@@ -39,6 +39,7 @@ export default function Header() {
   const accessToken = localStorage.getItem('accessToken');
   const userData = useUserData((state) => state.userData);
   const initUserData = useUserData((state) => state.initUserData);
+  const resetUserData = useUserData((state) => state.resetUserData);
   const initPlaylistsData = useUserData((state) => state.initPlaylistsData);
   const initSongsData = useUserData((state) => state.initSongsData);
   const initFavoritedSongsData = useUserData((state) => state.initFavoritedSongsData);
@@ -76,14 +77,7 @@ export default function Header() {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('userId');
-    initUserData({
-      id: null,
-      first_name: null,
-      last_name: null,
-      email: null,
-      avatar: null,
-      role: null,
-    });
+    resetUserData();
     toast({
       title: 'Logged out successfully!',
       status: 'success',
