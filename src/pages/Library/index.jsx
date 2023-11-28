@@ -24,6 +24,8 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useNavigateSideBar from '../../hooks/useNavigateSideBar';
 
+import requestApi from '../../utils/api';
+
 export default function Library() {
   const navigate = useNavigate();
   const setUrl = useNavigateSideBar((state) => state.setUrl);
@@ -33,12 +35,30 @@ export default function Library() {
   const favoritedSongs = useUserData((state) => state.favoritedSongs);
   const queue = useQueueStore((state) => state.queue);
 
+  const initPlaylistsData = useUserData((state) => state.initPlaylistsData);
+  const initSongsData = useUserData((state) => state.initSongsData);
+  const initFavoritedSongsData = useUserData((state) => state.initFavoritedSongsData);
+
   useEffect(() => {
+    const fetchUserData = async () => {
+      const userDataRes = await requestApi('/users/curr/info', 'GET');
+      initSongsData(userDataRes.data.result.songs);
+      initFavoritedSongsData(userDataRes.data.result.favoriteSongs);
+    };
+
+    const fetchPlaylistsData = async () => {
+      const playlistsDataRes = await requestApi('/playlists', 'GET');
+      initPlaylistsData(playlistsDataRes.data.result);
+    };
+
     if (!accessToken) {
       navigate('/');
       setUrl('/');
+    } else {
+      fetchPlaylistsData();
+      fetchUserData();
     }
-  }, []);
+  }, [accessToken]);
 
   return (
     <Stack

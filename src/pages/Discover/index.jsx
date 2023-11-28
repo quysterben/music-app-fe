@@ -64,9 +64,16 @@ export default function Discover() {
           </Carousel.Item>
         ))}
       </Carousel>
-      <Heading ml={8} mt={4} mb={40} fontSize="xl" fontWeight="bold">
+      <Heading ml={8} mt={4} fontSize="xl" fontWeight="bold">
         Gần đây
       </Heading>
+      <SimpleGrid columns={3} ml={8}>
+        {!loading &&
+          queue
+            .slice(0, 3)
+            .toReversed()
+            .map((song) => <MusicCard key={song.id} musicData={song} />)}
+      </SimpleGrid>
       <Text color="gray.600" fontWeight="xs" ml={8}>
         Bắt đầu nghe từ một bài hát
       </Text>
@@ -82,7 +89,7 @@ export default function Discover() {
       <Heading ml={8} fontSize="xl" fontWeight="bold">
         Tất cả bài hát
       </Heading>
-      <SimpleGrid columns={3} ml={8} mb={40}>
+      <SimpleGrid columns={3} ml={8}>
         {!loading && songs.map((song) => <MusicCard key={song.id} musicData={song} />)}
       </SimpleGrid>
     </Flex>

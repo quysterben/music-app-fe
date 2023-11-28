@@ -13,10 +13,10 @@ import {
   Button,
   VStack,
   Input,
-  Flex,
-  Text,
-  Switch,
+  useToast,
 } from '@chakra-ui/react';
+
+import requestApi from '../../../../utils/api';
 
 PlaylistModal.propTypes = {
   isOpen: Proptypes.bool,
@@ -24,7 +24,31 @@ PlaylistModal.propTypes = {
 };
 
 export default function PlaylistModal({ isOpen, onClose }) {
+  const toast = useToast();
   const [playlistName, setPlaylistName] = useState('');
+
+  const handleSubmit = async () => {
+    try {
+      await requestApi('/playlists', 'POST', { name: playlistName });
+      toast({
+        title: 'Tạo playlist mới thành công',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      setPlaylistName('');
+      onClose();
+    } catch (err) {
+      toast({
+        title: 'Tạo playlist mới thất bại',
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+        position: 'top-right',
+      });
+    }
+  };
 
   return (
     <Modal size="xs" isOpen={isOpen} onClose={onClose}>
@@ -46,24 +70,6 @@ export default function PlaylistModal({ isOpen, onClose }) {
               variant="unstyled"
               placeholder="Tên playlist"
             />
-            <Flex justify="space-between" w="full" gap={2} alignItems="center">
-              <Flex flexDir="column" color={'white'}>
-                <Text>Công khai</Text>
-                <Text fontSize="xs" color="gray">
-                  Mọi người có thể nhìn thấy playlist này
-                </Text>
-              </Flex>
-              <Switch colorScheme="purple" size="md" />
-            </Flex>
-            <Flex justify="space-between" w="full" gap={2} alignItems="center">
-              <Flex flexDir="column" color={'white'}>
-                <Text>Phát ngẫu nhiên</Text>
-                <Text fontSize="xs" color="gray">
-                  Luôn phát ngẫu nhiên tất cả bài hát
-                </Text>
-              </Flex>
-              <Switch colorScheme="purple" size="md" />
-            </Flex>
           </VStack>
         </ModalBody>
 
@@ -76,6 +82,7 @@ export default function PlaylistModal({ isOpen, onClose }) {
             color="white"
             rounded="full"
             w="full"
+            onClick={handleSubmit}
             _hover={{ bg: 'purple.500' }}
           >
             Tạo mới

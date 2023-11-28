@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import usePlayerStore from '../../../hooks/usePlayerStore';
 import useQueueStore from '../../../hooks/useQueueStore';
 
+import requestApi from '../../../utils/api';
+
 import {
   Image,
   Flex,
@@ -24,9 +26,14 @@ import { PiPlaylistBold } from 'react-icons/pi';
 import { TbRepeatOnce, TbRepeat } from 'react-icons/tb';
 import { MdGraphicEq, MdPauseCircleOutline, MdPlayCircleOutline } from 'react-icons/md';
 import MusicQueueCard from '../../../components/MusicQueueCard';
+import isFavoriteSong from '../../../helpers/isFavouriteSong';
+import useUserData from '../../../hooks/useUserData';
 
 export default function MusicPlayer() {
   const queue = useQueueStore((state) => state.queue);
+
+  const favoritedSongs = useUserData((state) => state.favoritedSongs);
+  const initFavoritedSongsData = useUserData((state) => state.initFavoritedSongsData);
 
   const curruntSong = usePlayerStore((state) => state.curruntSong);
   const setCurrentSong = usePlayerStore((state) => state.setCurruntSong);
@@ -36,6 +43,7 @@ export default function MusicPlayer() {
 
   const audioRef = useRef();
   const currentTimeRef = useRef();
+
   // playing state
   const isPlaying = usePlayerStore((state) => state.isPlaying);
   const setIsPlaying = usePlayerStore((state) => state.setIsPlaying);
@@ -94,6 +102,16 @@ export default function MusicPlayer() {
     audioRef.current.play();
   };
 
+  const handleFavoriteSong = async () => {
+    try {
+      const res = await requestApi(`/songs/favorite/${curruntSong.id}`, 'GET');
+      initFavoritedSongsData(res.data.result.response.favoriteSongs);
+      console.log(isFavoriteSong(curruntSong, favoritedSongs));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   // Handle open playlist drawer
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
@@ -129,8 +147,12 @@ export default function MusicPlayer() {
               {curruntSong.artist}
             </Text>
           </Flex>
-          <Flex mx={4}>
-            <FaRegHeart size="16" color="white" />
+          <Flex
+            mx={4}
+            onClick={handleFavoriteSong}
+            color={isFavoriteSong(curruntSong, favoritedSongs) ? 'purplePrimary' : 'whiteAlpha.600'}
+          >
+            <FaRegHeart size="16" />
           </Flex>
         </Flex>
         <Flex flex={1} flexDir="column" justifyContent="center" alignItems="center" gap={0} px={12}>
