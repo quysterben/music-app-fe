@@ -5,8 +5,9 @@ const usePlayerStore = create((set) => ({
   curruntSongIndex: null,
   isPlaying: false,
   isRandom: false,
-  isRepeat: false,
+  isRepeat: 0, // 0: not repeat, 1: repeat all, 2: repeat only one
   volume: 0.5,
+  currentTime: 0,
   setCurruntSong: (data) => {
     return set({ curruntSong: data });
   },
@@ -24,6 +25,9 @@ const usePlayerStore = create((set) => ({
   },
   setVolume: (data) => {
     return set({ volume: data });
+  },
+  setCurrentTime: (data) => {
+    return set({ currentTime: data });
   },
 }));
 

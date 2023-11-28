@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+import { useEffect, useRef, useState } from 'react';
 import usePlayerStore from '../../../hooks/usePlayerStore';
 import useQueueStore from '../../../hooks/useQueueStore';
 
@@ -11,34 +12,47 @@ import {
   SliderTrack,
   SliderThumb,
   SliderFilledTrack,
+  useDisclosure,
+  Drawer,
+  DrawerBody,
+  DrawerHeader,
+  DrawerContent,
+  VStack,
 } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
 import { FaRegHeart, FaRandom, FaStepBackward, FaStepForward, FaVolumeUp } from 'react-icons/fa';
-import { RxLoop } from 'react-icons/rx';
+import { PiPlaylistBold } from 'react-icons/pi';
+import { TbRepeatOnce, TbRepeat } from 'react-icons/tb';
 import { MdGraphicEq, MdPauseCircleOutline, MdPlayCircleOutline } from 'react-icons/md';
+import MusicQueueCard from '../../../components/MusicQueueCard';
 
 export default function MusicPlayer() {
   const queue = useQueueStore((state) => state.queue);
+
   const curruntSong = usePlayerStore((state) => state.curruntSong);
+  const setCurrentSong = usePlayerStore((state) => state.setCurruntSong);
+
+  const currentSongIndex = usePlayerStore((state) => state.curruntSongIndex);
+  const setCurrentSongIndex = usePlayerStore((state) => state.setCurruntSongIndex);
 
   const audioRef = useRef();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [volume, setVolume] = useState(0.5);
+  const currentTimeRef = useRef();
+  // playing state
+  const isPlaying = usePlayerStore((state) => state.isPlaying);
+  const setIsPlaying = usePlayerStore((state) => state.setIsPlaying);
+
+  const isRepeat = usePlayerStore((state) => state.isRepeat);
+  const setIsRepeat = usePlayerStore((state) => state.setIsRepeat);
+
+  const volume = usePlayerStore((state) => state.volume);
+  const setVolume = usePlayerStore((state) => state.setVolume);
+
+  const currentTime = usePlayerStore((state) => state.currentTime);
+  const setCurrentTime = usePlayerStore((state) => state.setCurrentTime);
 
   useEffect(() => {
-    if (!audioRef.current) return;
-    audioRef.current.load();
     const playPromise = audioRef.current.play();
     playPromise.then(() => {}).catch((err) => {});
-    audioRef.current.addEventListener('timeupdate', () => {
-      if (currentTime === curruntSong.duration) {
-        setIsPlaying(false);
-      }
-      setCurrentTime(audioRef.current.currentTime);
-    });
-    setIsPlaying(true);
-  }, []);
+  }, [curruntSong, currentSongIndex]);
 
   useEffect(() => {
     if (isPlaying) {
@@ -52,6 +66,10 @@ export default function MusicPlayer() {
     audioRef.current.volume = volume;
   }, [volume]);
 
+  // Handle open playlist drawer
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const btnRef = useRef();
+
   const getTimeDuration = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
@@ -59,7 +77,7 @@ export default function MusicPlayer() {
     return `${minutes}:${seconds}`;
   };
 
-  const getPlayingProcess = () => {
+  const getPlayingProcess = (currentTime) => {
     return (currentTime / curruntSong.duration) * 100;
   };
 
@@ -112,17 +130,26 @@ export default function MusicPlayer() {
               <FaStepForward size="16" color="white" />
             </Flex>
             <Flex p={2} cursor="pointer" rounded="full" _hover={{ bgColor: 'whiteAlpha.400' }}>
-              <RxLoop size="16" color="white" />
+              {isRepeat === 0 ? (
+                <TbRepeat size="16" color="white" onClick={() => setIsRepeat(1)} />
+              ) : isRepeat === 1 ? (
+                <Flex color="purplePrimary">
+                  <TbRepeat size="16" onClick={() => setIsRepeat(2)} />
+                </Flex>
+              ) : (
+                <Flex color="purplePrimary">
+                  <TbRepeatOnce size="16" onClick={() => setIsRepeat(0)} />
+                </Flex>
+              )}
             </Flex>
           </Flex>
           <Flex gap={2} w="50%">
-            <Text color="whiteAlpha.600" fontSize="xs">
-              {getTimeDuration(currentTime)}
-            </Text>
+            <Text ref={currentTimeRef} color="whiteAlpha.600" fontSize="xs" />
             <Slider
               onChange={(e) => (audioRef.current.currentTime = curruntSong.duration * (e / 100))}
               aria-label="slider-ex-4"
-              value={getPlayingProcess()}
+              defaultValue={0}
+              value={getPlayingProcess(currentTime)}
             >
               <SliderTrack bg="whiteAlpha.400">
                 <SliderFilledTrack bg="whiteAlpha.900" />
@@ -131,7 +158,32 @@ export default function MusicPlayer() {
                 <Box color="whiteAlpha.900" as={MdGraphicEq} />
               </SliderThumb>
             </Slider>
-            <audio ref={audioRef} src={curruntSong.url} />
+            <audio
+              onEnded={() => {
+                if (isRepeat === 2) {
+                  audioRef.current.currentTime = 0;
+                  setIsPlaying(true);
+                  audioRef.current.play();
+                  return;
+                }
+                if (currentSongIndex === queue.length - 1) {
+                  setCurrentSong(queue[0]);
+                  setCurrentSongIndex(0);
+                  if (isRepeat === 1) return;
+                  setIsPlaying(false);
+                  audioRef.current.pause();
+                  return;
+                }
+                setCurrentSong(queue[currentSongIndex + 1]);
+                setCurrentSongIndex(currentSongIndex + 1);
+              }}
+              onTimeUpdate={() => {
+                currentTimeRef.current.innerText = getTimeDuration(audioRef.current.currentTime);
+                setCurrentTime(audioRef.current.currentTime);
+              }}
+              ref={audioRef}
+              src={curruntSong.url}
+            />
             <Text color="whiteAlpha.600" fontSize="xs">
               {getTimeDuration(curruntSong.duration)}
             </Text>
@@ -154,7 +206,57 @@ export default function MusicPlayer() {
               </SliderThumb>
             </Slider>
           </Flex>
+          <Flex
+            onClick={onOpen}
+            p={2}
+            cursor="pointer"
+            rounded="full"
+            _hover={{ bgColor: 'whiteAlpha.400' }}
+          >
+            <PiPlaylistBold size={16} color="white" />
+          </Flex>
         </Flex>
+
+        <Drawer isOpen={isOpen} placement="right" onClose={onClose} finalFocusRef={btnRef}>
+          <DrawerContent color="white" bgColor="drawerBg">
+            <DrawerHeader>
+              <Flex justify="space-between" alignItems="center">
+                <Text fontSize="md" fontWeight="bold">
+                  Danh sách phát
+                </Text>
+                <Flex p={2} cursor="pointer" rounded="full" _hover={{ bgColor: 'whiteAlpha.400' }}>
+                  <PiPlaylistBold size={16} color="white" />
+                </Flex>
+              </Flex>
+            </DrawerHeader>
+            <DrawerBody
+              overflowY="auto"
+              css={{
+                '&::-webkit-scrollbar': {
+                  width: '4px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  width: '6px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: '#B2BEB5',
+                  borderRadius: '24px',
+                },
+              }}
+            >
+              <VStack w="full">
+                {queue.map((song, index) => (
+                  <MusicQueueCard
+                    key={song.id}
+                    musicDataIndex={index}
+                    musicData={song}
+                    currentSong={curruntSong}
+                  />
+                ))}
+              </VStack>
+            </DrawerBody>
+          </DrawerContent>
+        </Drawer>
       </Flex>
     )
   );

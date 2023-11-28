@@ -17,15 +17,25 @@ export default function MusicCard({ musicData }) {
   const setCurruntSong = usePlayerStore((state) => state.setCurruntSong);
   const setCurruntSongIndex = usePlayerStore((state) => state.setCurruntSongIndex);
 
+  const setIsPlaying = usePlayerStore((state) => state.setIsPlaying);
+
   const handleAddSongToQueue = () => {
     if (queue.length === 0) {
       addSongToQueue(musicData);
       setCurruntSong(musicData);
       setCurruntSongIndex(queue.length - 1);
+      setIsPlaying(true);
     } else {
       const isSongExist = queue.find((song) => song.id === musicData.id);
       if (!isSongExist) {
         addSongToQueue(musicData);
+        setCurruntSong(musicData);
+        setCurruntSongIndex(queue.length);
+        setIsPlaying(true);
+      } else {
+        setCurruntSong(musicData);
+        setCurruntSongIndex(queue.findIndex((song) => song.id === musicData.id));
+        setIsPlaying(true);
       }
     }
   };

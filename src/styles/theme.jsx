@@ -24,6 +24,7 @@ const theme = extendTheme({
     purplePrimary: '#9b4de0',
     primaryBg: '#34224f',
     playerBg: '#130c1c',
+    drawerBg: '#120822',
   },
 });
 
