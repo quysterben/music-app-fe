@@ -20,8 +20,16 @@ import {
   DrawerHeader,
   DrawerContent,
   VStack,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  useToast,
 } from '@chakra-ui/react';
 import { FaRegHeart, FaRandom, FaStepBackward, FaStepForward, FaVolumeUp } from 'react-icons/fa';
+import { TbPlaylistAdd } from 'react-icons/tb';
+import { MdClearAll } from 'react-icons/md';
 import { PiPlaylistBold } from 'react-icons/pi';
 import { TbRepeatOnce, TbRepeat } from 'react-icons/tb';
 import { MdGraphicEq, MdPauseCircleOutline, MdPlayCircleOutline } from 'react-icons/md';
@@ -30,7 +38,13 @@ import isFavoriteSong from '../../../helpers/isFavouriteSong';
 import useUserData from '../../../hooks/useUserData';
 
 export default function MusicPlayer() {
+  const toast = useToast();
+
   const queue = useQueueStore((state) => state.queue);
+  const initQueueData = useQueueStore((state) => state.initQueue);
+
+  const playlists = useUserData((state) => state.playlists);
+  const initPlaylistData = useUserData((state) => state.initPlaylistsData);
 
   const favoritedSongs = useUserData((state) => state.favoritedSongs);
   const initFavoritedSongsData = useUserData((state) => state.initFavoritedSongsData);
@@ -273,6 +287,59 @@ export default function MusicPlayer() {
               </SliderThumb>
             </Slider>
           </Flex>
+          <Menu>
+            <MenuButton
+              p={2}
+              rounded="full"
+              bgColor="playerBg"
+              _hover={{ bgColor: 'whiteAlpha.400' }}
+              size="sm"
+            >
+              <TbPlaylistAdd size={20} color="white" />
+            </MenuButton>
+            <MenuList bg="primaryBg" borderColor="primaryBg">
+              {playlists.map((playlist) => {
+                if (isFavoriteSong(curruntSong, playlist.songs)) return null;
+                return (
+                  <MenuItem
+                    color="white"
+                    bg="primaryBg"
+                    _hover={{ bgColor: 'whiteAlpha.400' }}
+                    key={playlist.id}
+                    onClick={async () => {
+                      try {
+                        const res = await requestApi(`/playlists/add`, 'PATCH', {
+                          songId: curruntSong.id,
+                          playlistId: playlist.id,
+                        });
+                        initPlaylistData([
+                          ...playlists.filter((item) => item.id !== playlist.id),
+                          res.data.result,
+                        ]);
+                        toast({
+                          title: 'Thành công',
+                          description: 'Thêm bài hát vào danh sách phát thành công',
+                          status: 'success',
+                          duration: 3000,
+                          isClosable: true,
+                        });
+                      } catch (err) {
+                        toast({
+                          title: 'Lỗi',
+                          description: err.message,
+                          status: 'error',
+                          duration: 3000,
+                          isClosable: true,
+                        });
+                      }
+                    }}
+                  >
+                    {playlist.name}
+                  </MenuItem>
+                );
+              })}
+            </MenuList>
+          </Menu>
           <Flex
             onClick={onOpen}
             p={2}
@@ -292,7 +359,7 @@ export default function MusicPlayer() {
                   Danh sách phát
                 </Text>
                 <Flex p={2} cursor="pointer" rounded="full" _hover={{ bgColor: 'whiteAlpha.400' }}>
-                  <PiPlaylistBold size={16} color="white" />
+                  <MdClearAll onClick={() => initQueueData([])} size={16} color="white" />
                 </Flex>
               </Flex>
             </DrawerHeader>
