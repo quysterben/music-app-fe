@@ -9,6 +9,9 @@ const useUserData = create((set) => ({
     avatar: null,
     role: null,
   },
+  playlists: [],
+  songs: [],
+  favoritedSongs: [],
   initUserData: (data) => {
     console.log(data);
     const newData = {
@@ -20,6 +23,15 @@ const useUserData = create((set) => ({
       role: data.role,
     };
     return set({ userData: newData });
+  },
+  initPlaylistsData: (data) => {
+    return set({ playlists: data });
+  },
+  initSongsData: (data) => {
+    return set({ songs: data });
+  },
+  initFavoritedSongsData: (data) => {
+    return set({ favoritedSongs: data });
   },
 }));
 
