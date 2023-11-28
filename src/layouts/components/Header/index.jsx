@@ -39,6 +39,9 @@ export default function Header() {
   const accessToken = localStorage.getItem('accessToken');
   const userData = useUserData((state) => state.userData);
   const initUserData = useUserData((state) => state.initUserData);
+  const initPlaylistsData = useUserData((state) => state.initPlaylistsData);
+  const initSongsData = useUserData((state) => state.initSongsData);
+  const initFavoritedSongsData = useUserData((state) => state.initFavoritedSongsData);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -46,6 +49,19 @@ export default function Header() {
         try {
           const userDataRes = await requestApi('/users/curr/info', 'GET');
           initUserData(userDataRes.data.result);
+          initSongsData(userDataRes.data.result.songs);
+          initFavoritedSongsData(userDataRes.data.result.favoriteSongs);
+        } catch (err) {
+          handleLogout();
+        }
+      }
+    };
+
+    const fetchPlaylistsData = async () => {
+      if (accessToken) {
+        try {
+          const playlistsDataRes = await requestApi('/playlists', 'GET');
+          initPlaylistsData(playlistsDataRes.data.result);
         } catch (err) {
           handleLogout();
         }
@@ -53,6 +69,7 @@ export default function Header() {
     };
 
     fetchUserData();
+    fetchPlaylistsData();
   }, []);
 
   const handleLogout = () => {
