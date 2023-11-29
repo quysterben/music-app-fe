@@ -30,6 +30,13 @@ function MusicRankingCard({ songData, rank }) {
 
   const setIsPlaying = usePlayerStore((state) => state.setIsPlaying);
 
+  const getTimeDuration = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    if (seconds < 10) return `${minutes}:0${seconds}`;
+    return `${minutes}:${seconds}`;
+  };
+
   const handleAddSongToQueue = async () => {
     if (accessToken) {
       await requestApi(`/songs/recent/${songData.id}`, 'POST');
@@ -111,7 +118,7 @@ function MusicRankingCard({ songData, rank }) {
         >
           <FaRegHeart size="16" />
         </Flex>
-        <Text>3:55</Text>
+        <Text>{getTimeDuration(songData.duration)}</Text>
       </HStack>
     </HStack>
   );
