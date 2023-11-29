@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Proptypes from 'prop-types';
 
 import { useState } from 'react';
@@ -20,6 +21,7 @@ import {
 } from '@chakra-ui/react';
 
 import requestApi from '../../../../utils/api';
+import useUserData from '../../../../hooks/useUserData';
 
 PlaylistModal.propTypes = {
   isOpen: Proptypes.bool,
@@ -31,9 +33,15 @@ export default function PlaylistModal({ isOpen, onClose }) {
   const [playlistName, setPlaylistName] = useState('');
   const [isPublic, setIsPublic] = useState(false);
 
+  const playlists = useUserData((state) => state.playlists);
+  const setPlaylists = useUserData((state) => state.initPlaylistsData);
+
   const handleSubmit = async () => {
     try {
-      await requestApi('/playlists', 'POST', { name: playlistName, isPublic: isPublic });
+      const res = await requestApi('/playlists', 'POST', {
+        name: playlistName,
+        isPublic: isPublic,
+      });
       toast({
         title: 'Tạo playlist mới thành công',
         status: 'success',
@@ -42,6 +50,7 @@ export default function PlaylistModal({ isOpen, onClose }) {
         position: 'top-right',
       });
       setPlaylistName('');
+      setPlaylists([...playlists, res.data.result]);
       onClose();
     } catch (err) {
       toast({

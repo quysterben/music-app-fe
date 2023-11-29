@@ -3,7 +3,6 @@ import {
   HStack,
   Heading,
   Text,
-  Button,
   VStack,
   Tab,
   Tabs,
@@ -14,8 +13,6 @@ import {
 } from '@chakra-ui/react';
 
 import { FaPlayCircle } from 'react-icons/fa';
-import { IoIosAddCircleOutline } from 'react-icons/io';
-import { IoIosArrowForward } from 'react-icons/io';
 import useUserData from '../../hooks/useUserData';
 import PlaylistCard from '../../components/PlaylistCard';
 import useQueueStore from '../../hooks/useQueueStore';
@@ -96,17 +93,9 @@ export default function Library() {
             <Text fontWeight="bold" fontSize="24px" color="white">
               Playlist
             </Text>
-            <Button pl="0" bgColor="transparent" _hover={{ bgColor: 'transparent' }}>
-              <IoIosAddCircleOutline fontSize="24px" color="white" />
-            </Button>
           </HStack>
 
-          <HStack>
-            <Text fontSize="12px" color="#bbb">
-              TẤT CẢ
-            </Text>
-            <IoIosArrowForward fontSize="20px" color="#bbb" />
-          </HStack>
+          <HStack></HStack>
         </HStack>
 
         <HStack justifyContent="flex-start" w={'100%'} gap="20px">
