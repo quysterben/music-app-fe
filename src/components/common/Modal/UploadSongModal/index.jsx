@@ -28,8 +28,10 @@ UploadSongModal.propTypes = {
 export default function UploadSongModal({ isOpen, onClose }) {
   const toast = useToast();
   const [songName, setSongName] = useState('');
+  const [songArtist, setSongArtist] = useState('');
   const [songData, setSongData] = useState(null);
   const [imageData, setImageData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     if (!songData || !imageData) {
@@ -41,7 +43,7 @@ export default function UploadSongModal({ isOpen, onClose }) {
         duration: 2000,
       });
       return;
-    } else if (songName === '') {
+    } else if (songName === '' || songArtist === '') {
       toast({
         title: 'Vui lòng nhập tên bài hát',
         status: 'error',
@@ -52,10 +54,32 @@ export default function UploadSongModal({ isOpen, onClose }) {
       return;
     }
     try {
+      setLoading(true);
       const formData = new FormData();
-      formData.append('arkwork', imageData);
+      formData.append('artwork', imageData);
       const resArtwork = await requestApi('/songs/upload-art', 'POST', formData);
-      console.log(resArtwork);
+      const imageUrl = resArtwork.data.result;
+      const musicFormData = new FormData();
+      musicFormData.append('song', songData);
+      const resMusic = await requestApi('/songs/upload-audio', 'POST', musicFormData);
+      const musicUrl = resMusic.data.result.url;
+      const musicDuration = Math.round(resMusic.data.result.duration);
+      const res = await requestApi('/songs', 'POST', {
+        name: songName,
+        artwork: imageUrl,
+        url: musicUrl,
+        artist: songArtist,
+        duration: musicDuration,
+      });
+      toast({
+        title: 'Tải lên thành công',
+        status: 'success',
+        position: 'top-right',
+        isClosable: true,
+        duration: 2000,
+      });
+      setLoading(false);
+      onClose();
     } catch (err) {
       toast({
         title: err.message,
@@ -87,6 +111,16 @@ export default function UploadSongModal({ isOpen, onClose }) {
               variant="unstyled"
               placeholder="Tên bài hát"
             />
+            <Input
+              onChange={(e) => setSongArtist(e.target.value)}
+              color="white"
+              borderRadius="full"
+              px={4}
+              py={2}
+              bg="whiteAlpha.400"
+              variant="unstyled"
+              placeholder="Nghệ sĩ"
+            />
             <Text color="white">Chọn file bài hát (mp3, wav, flac, ...)</Text>
             <Input
               onChange={(e) => setSongData(e.target.files[0])}
@@ -116,6 +150,7 @@ export default function UploadSongModal({ isOpen, onClose }) {
 
         <ModalFooter>
           <Button
+            isLoading={loading}
             isActive={songName === ''}
             isDisabled={songName === ''}
             size="md"

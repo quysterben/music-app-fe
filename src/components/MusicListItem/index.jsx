@@ -55,6 +55,13 @@ function MusicListItem({ songData }) {
     }
   };
 
+  const getTimeDuration = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    if (seconds < 10) return `${minutes}:0${seconds}`;
+    return `${minutes}:${seconds}`;
+  };
+
   const initFavoritedSongsData = useUserData((state) => state.initFavoritedSongsData);
 
   const handleFavoriteSong = async () => {
@@ -81,7 +88,7 @@ function MusicListItem({ songData }) {
             w="50px"
             _hover={{ transform: 'scale(1.1)', cursor: 'pointer' }}
             transition="all linear 0.4s"
-            src={songData.artwork}
+            src={songData?.artwork}
           />
         </Box>
 
@@ -103,7 +110,7 @@ function MusicListItem({ songData }) {
         >
           <FaRegHeart size="16" />
         </Flex>
-        <Text>3:55</Text>
+        <Text>{getTimeDuration(songData.duration)}</Text>
       </HStack>
     </HStack>
   );

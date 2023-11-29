@@ -297,48 +297,50 @@ export default function MusicPlayer() {
             >
               <TbPlaylistAdd size={20} color="white" />
             </MenuButton>
-            <MenuList bg="primaryBg" borderColor="primaryBg">
-              {playlists.map((playlist) => {
-                if (isFavoriteSong(curruntSong, playlist.songs)) return null;
-                return (
-                  <MenuItem
-                    color="white"
-                    bg="primaryBg"
-                    _hover={{ bgColor: 'whiteAlpha.400' }}
-                    key={playlist.id}
-                    onClick={async () => {
-                      try {
-                        const res = await requestApi(`/playlists/add`, 'PATCH', {
-                          songId: curruntSong.id,
-                          playlistId: playlist.id,
-                        });
-                        initPlaylistData([
-                          ...playlists.filter((item) => item.id !== playlist.id),
-                          res.data.result,
-                        ]);
-                        toast({
-                          title: 'Thành công',
-                          description: 'Thêm bài hát vào danh sách phát thành công',
-                          status: 'success',
-                          duration: 3000,
-                          isClosable: true,
-                        });
-                      } catch (err) {
-                        toast({
-                          title: 'Lỗi',
-                          description: err.message,
-                          status: 'error',
-                          duration: 3000,
-                          isClosable: true,
-                        });
-                      }
-                    }}
-                  >
-                    {playlist.name}
-                  </MenuItem>
-                );
-              })}
-            </MenuList>
+            {playlists.length === 0 ? null : (
+              <MenuList bg="primaryBg" borderColor="primaryBg">
+                {playlists.map((playlist) => {
+                  if (isFavoriteSong(curruntSong, playlist.songs)) return null;
+                  return (
+                    <MenuItem
+                      color="white"
+                      bg="primaryBg"
+                      _hover={{ bgColor: 'whiteAlpha.400' }}
+                      key={playlist.id}
+                      onClick={async () => {
+                        try {
+                          const res = await requestApi(`/playlists/add`, 'PATCH', {
+                            songId: curruntSong.id,
+                            playlistId: playlist.id,
+                          });
+                          initPlaylistData([
+                            ...playlists.filter((item) => item.id !== playlist.id),
+                            res.data.result,
+                          ]);
+                          toast({
+                            title: 'Thành công',
+                            description: 'Thêm bài hát vào danh sách phát thành công',
+                            status: 'success',
+                            duration: 3000,
+                            isClosable: true,
+                          });
+                        } catch (err) {
+                          toast({
+                            title: 'Lỗi',
+                            description: err.message,
+                            status: 'error',
+                            duration: 3000,
+                            isClosable: true,
+                          });
+                        }
+                      }}
+                    >
+                      {playlist.name}
+                    </MenuItem>
+                  );
+                })}
+              </MenuList>
+            )}
           </Menu>
           <Flex
             onClick={onOpen}
