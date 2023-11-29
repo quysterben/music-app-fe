@@ -58,6 +58,8 @@ export default function MusicPlayer() {
   const audioRef = useRef();
   const currentTimeRef = useRef();
 
+  const [showVolumnSlider, setShowVolumnSlider] = useState(false);
+
   // playing state
   const isPlaying = usePlayerStore((state) => state.isPlaying);
   const setIsPlaying = usePlayerStore((state) => state.setIsPlaying);
@@ -290,21 +292,38 @@ export default function MusicPlayer() {
           </Flex>
         </Flex>
         <Flex w="20%" justifyContent="center" alignItems="center" gap={4} px={12}>
-          <Flex w="full" gap={4}>
-            <FaVolumeUp size="16" color="white" />
-            <Slider
-              onChange={(e) => setVolume(e / 100)}
-              w={16}
-              aria-label="slider-ex-2"
-              value={volume * 100}
-            >
-              <SliderTrack bg="whiteAlpha.400">
-                <SliderFilledTrack bg="whiteAlpha.900" />
-              </SliderTrack>
-              <SliderThumb boxSize={2}>
-                <Box color="whiteAlpha.900" as={MdGraphicEq} />
-              </SliderThumb>
-            </Slider>
+          <Flex w="full" gap={4} position="relative">
+            <FaVolumeUp
+              onMouseEnter={() => {
+                window.addEventListener('wheel', (event) => {
+                  setShowVolumnSlider(true);
+                  if (event.deltaY < 0) {
+                    setVolume(volume + 20 / 100);
+                  } else {
+                    setVolume(volume - 20 / 100);
+                  }
+                });
+              }}
+              size="16"
+              color="white"
+            />
+            <Box bottom={0} left={0} position="absolute">
+              <Slider
+                display={showVolumnSlider ? 'block' : 'none'}
+                orientation="vertical"
+                onChange={(e) => setVolume(e / 100)}
+                h={16}
+                aria-label="slider-ex-2"
+                value={volume * 100}
+              >
+                <SliderTrack bg="whiteAlpha.400">
+                  <SliderFilledTrack bg="whiteAlpha.900" />
+                </SliderTrack>
+                <SliderThumb boxSize={2}>
+                  <Box color="whiteAlpha.900" as={MdGraphicEq} />
+                </SliderThumb>
+              </Slider>
+            </Box>
           </Flex>
           <Menu>
             <MenuButton
