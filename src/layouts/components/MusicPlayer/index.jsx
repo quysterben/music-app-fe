@@ -65,6 +65,9 @@ export default function MusicPlayer() {
   const isRepeat = usePlayerStore((state) => state.isRepeat);
   const setIsRepeat = usePlayerStore((state) => state.setIsRepeat);
 
+  const isRandom = usePlayerStore((state) => state.isRandom);
+  const setIsRandom = usePlayerStore((state) => state.setIsRandom);
+
   const volume = usePlayerStore((state) => state.volume);
   const setVolume = usePlayerStore((state) => state.setVolume);
 
@@ -89,6 +92,15 @@ export default function MusicPlayer() {
   }, [volume]);
 
   const handleNextSong = () => {
+    if (isRandom) {
+      const randomIndex = Math.floor(Math.random() * queue.length);
+      setCurrentSong(queue[randomIndex]);
+      setCurrentSongIndex(randomIndex);
+      setIsPlaying(true);
+      audioRef.current.play();
+      return;
+    }
+
     if (currentSongIndex === queue.length - 1) {
       setCurrentSong(queue[0]);
       setCurrentSongIndex(0);
@@ -170,8 +182,15 @@ export default function MusicPlayer() {
         </Flex>
         <Flex flex={1} flexDir="column" justifyContent="center" alignItems="center" gap={0} px={12}>
           <Flex gap={2} justifyContent="center" alignItems="center">
-            <Flex p={2} cursor="pointer" rounded="full" _hover={{ bgColor: 'whiteAlpha.400' }}>
-              <FaRandom size="16" color="white" />
+            <Flex
+              p={2}
+              onClick={() => setIsRandom(!isRandom)}
+              color={isRandom ? 'purplePrimary' : 'whiteAlpha.600'}
+              cursor="pointer"
+              rounded="full"
+              _hover={{ bgColor: 'whiteAlpha.400' }}
+            >
+              <FaRandom size="16" />
             </Flex>
             <Flex
               p={2}
