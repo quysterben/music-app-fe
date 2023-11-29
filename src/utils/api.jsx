@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BASEURL = 'http://128.199.95.147';
+const BASEURL = 'https://thinhnguyen.live';
+// const BASEURL = 'http://128.199.95.147';
 // const BASEURL = 'http://localhost:8800';
 
 export default function requestApi(endpoint, method, body, responseType = 'json') {
